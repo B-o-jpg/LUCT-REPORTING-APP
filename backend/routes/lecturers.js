@@ -1,6 +1,21 @@
 import express from "express";
 import db from "../config/db.js";
+import {
+    getLecturers,
+    addLecturer,
+    updateLecturer,
+    deleteLecturer,
+    exportLecturersExcel
+} from "../controllers/Lecturers.js";
+
 const router = express.Router();
+
+router.get("/", getLecturers);
+router.post("/", addLecturer);
+router.put("/:id", updateLecturer);
+router.delete("/:id", deleteLecturer);
+router.get("/export", exportLecturersExcel);
+
 
 // GET all lecturers
 router.get("/", async(req, res) => {

@@ -12,8 +12,12 @@ import lecturersRoutes from "./routes/lecturers.js";
 import coursesRoutes from "./routes/courses.js";
 import classesRoutes from "./routes/classes.js";
 import reportsRoutes from "./routes/reports.js";
-import dashboardRoutes from "./routes/dashboard.js";
 import usersRoutes from "./routes/users.js";
+import dashboardRoutes from "./routes/dashboard.js";
+import monitoringRoutes from "./routes/monitoring.js";
+import ratingRoutes from "./routes/rating.js";
+
+
 
 dotenv.config();
 const app = express();
@@ -32,8 +36,10 @@ app.use("/api/lecturers", lecturersRoutes);
 app.use("/api/courses", coursesRoutes);
 app.use("/api/classes", classesRoutes);
 app.use("/api/reports", reportsRoutes);
-app.use("/api/dashboard-counts", dashboardRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/monitoring", monitoringRoutes);
+app.use("/api/rating", ratingRoutes);
 
 // Login endpoint
 app.post("/api/login", async(req, res) => {

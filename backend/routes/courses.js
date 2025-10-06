@@ -1,6 +1,22 @@
 import express from "express";
 import db from "../config/db.js";
+import {
+    getCourses,
+    addCourse,
+    updateCourse,
+    deleteCourse,
+    exportCoursesExcel
+} from "../controllers/Courses.js";
+
 const router = express.Router();
+
+router.get("/", getCourses);
+router.post("/", addCourse);
+router.put("/:id", updateCourse);
+router.delete("/:id", deleteCourse);
+router.get("/export", exportCoursesExcel);
+
+
 
 // GET all courses
 router.get("/", async(req, res) => {

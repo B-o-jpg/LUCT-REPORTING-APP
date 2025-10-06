@@ -1,6 +1,20 @@
 import express from "express";
 import db from "../config/db.js";
+import {
+    getStudents,
+    addStudent,
+    updateStudent,
+    deleteStudent,
+    exportStudentsExcel
+} from "../controllers/Students.js";
+
 const router = express.Router();
+router.get("/", getStudents);
+router.post("/", addStudent);
+router.put("/:id", updateStudent);
+router.delete("/:id", deleteStudent);
+router.get("/export", exportStudentsExcel);
+
 
 // GET all students
 router.get("/", async(req, res) => {

@@ -3,8 +3,13 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import db from "../config/db.js";
-
+import express from "express";
+import { login, register } from "../controllers/Auth.js";
 const router = express.Router();
+
+router.post("/login", login);
+router.post("/register", register);
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // REGISTER

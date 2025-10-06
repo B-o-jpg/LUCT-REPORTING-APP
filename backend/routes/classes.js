@@ -1,7 +1,22 @@
 import express from "express";
 import db from "../config/db.js";
+import {
+    getClasses,
+    addClass,
+    updateClass,
+    deleteClass,
+    exportClassesExcel
+} from "../controllers/Classes.js";
 
 const router = express.Router();
+
+router.get("/", getClasses);
+router.post("/", addClass);
+router.put("/:id", updateClass);
+router.delete("/:id", deleteClass);
+router.get("/export", exportClassesExcel);
+
+
 
 // 🟢 Get all classes
 router.get("/", async(req, res) => {
