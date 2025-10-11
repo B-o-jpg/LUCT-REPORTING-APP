@@ -1,15 +1,13 @@
 {
   "files": {
-    "main.css": "/LUCT-REPORTING-APP/static/css/main.6c55b69e.css",
-    "main.js": "/LUCT-REPORTING-APP/static/js/main.45a6854d.js",
-    "static/js/453.4ed1c88b.chunk.js": "/LUCT-REPORTING-APP/static/js/453.4ed1c88b.chunk.js",
+    "main.css": "/LUCT-REPORTING-APP/static/css/main.b2298e13.css",
+    "main.js": "/LUCT-REPORTING-APP/static/js/main.3bb0ba1a.js",
     "index.html": "/LUCT-REPORTING-APP/index.html",
-    "main.6c55b69e.css.map": "/LUCT-REPORTING-APP/static/css/main.6c55b69e.css.map",
-    "main.45a6854d.js.map": "/LUCT-REPORTING-APP/static/js/main.45a6854d.js.map",
-    "453.4ed1c88b.chunk.js.map": "/LUCT-REPORTING-APP/static/js/453.4ed1c88b.chunk.js.map"
+    "main.b2298e13.css.map": "/LUCT-REPORTING-APP/static/css/main.b2298e13.css.map",
+    "main.3bb0ba1a.js.map": "/LUCT-REPORTING-APP/static/js/main.3bb0ba1a.js.map"
   },
   "entrypoints": [
-    "static/css/main.6c55b69e.css",
-    "static/js/main.45a6854d.js"
+    "static/css/main.b2298e13.css",
+    "static/js/main.3bb0ba1a.js"
   ]
 }
