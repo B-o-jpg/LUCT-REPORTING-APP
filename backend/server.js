@@ -2,11 +2,10 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import bcrypt from "bcryptjs";
-import db from "./config/db.js"; // relative import, works on Render
+import db from "./config/db.js"; // relative import
+import authRoutes from "./routes/auth.js";
 
-
-// Routes
+// Other routes
 import studentsRoutes from "./routes/students.js";
 import lecturersRoutes from "./routes/lecturers.js";
 import coursesRoutes from "./routes/courses.js";
@@ -16,8 +15,6 @@ import usersRoutes from "./routes/users.js";
 import dashboardRoutes from "./routes/dashboard.js";
 import monitoringRoutes from "./routes/monitoring.js";
 import ratingRoutes from "./routes/rating.js";
-
-
 
 dotenv.config();
 const app = express();
@@ -41,29 +38,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/monitoring", monitoringRoutes);
 app.use("/api/rating", ratingRoutes);
 
-// Login endpoint
-app.post("/api/login", async(req, res) => {
-    try {
-        const { email, password } = req.body;
-        if (!email || !password)
-            return res.status(400).json({ error: "Missing email/password" });
-
-        const [rows] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
-        if (rows.length === 0) return res.status(401).json({ error: "Invalid credentials" });
-
-        const user = rows[0];
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
-
-        res.json({
-            message: "Login successful",
-            user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role },
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
+// Auth routes
+app.use("/auth", authRoutes);
 
 // Start server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

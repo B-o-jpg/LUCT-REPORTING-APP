@@ -1,78 +1,43 @@
 import express from "express";
 import db from "../config/db.js";
-import {
-    getClasses,
-    addClass,
-    updateClass,
-    deleteClass,
-    exportClassesExcel
-} from "../controllers/Classes.js";
 
 const router = express.Router();
 
-router.get("/", getClasses);
-router.post("/", addClass);
-router.put("/:id", updateClass);
-router.delete("/:id", deleteClass);
-router.get("/export", exportClassesExcel);
-
-
-
-// 🟢 Get all classes
+// GET all classes
 router.get("/", async(req, res) => {
     try {
-        const [rows] = await db.query(`
-      SELECT 
-        classes.id,
-        classes.name,
-        courses.name AS course_name,
-        lecturers.lecturer_name AS lecturer_name,
-        classes.scheduled_time,
-        classes.venue
-      FROM classes
-      JOIN courses ON classes.course_id = courses.id
-      JOIN lecturers ON classes.lecturer_id = lecturers.id
-    `);
+        const [rows] = await db.execute(
+            "SELECT id, name, course_id, lecturer_id, scheduled_time, venue FROM classes"
+        );
         res.json(rows);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
 
-// 🟢 Add a new class
+// POST new class
 router.post("/", async(req, res) => {
     const { name, course_id, lecturer_id, scheduled_time, venue } = req.body;
     try {
-        const [result] = await db.query(
+        const [result] = await db.execute(
             "INSERT INTO classes (name, course_id, lecturer_id, scheduled_time, venue) VALUES (?, ?, ?, ?, ?)", [name, course_id, lecturer_id, scheduled_time, venue]
         );
-        res.status(201).json({ message: "Class added successfully", id: result.insertId });
+        res.json({ id: result.insertId, name, course_id, lecturer_id, scheduled_time, venue });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
 
-// 🟢 Delete a class
+// DELETE class
 router.delete("/:id", async(req, res) => {
     const { id } = req.params;
     try {
-        await db.query("DELETE FROM classes WHERE id = ?", [id]);
-        res.json({ message: "Class deleted successfully" });
+        await db.execute("DELETE FROM classes WHERE id = ?", [id]);
+        res.json({ message: "Class deleted" });
     } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// 🟢 Update a class
-router.put("/:id", async(req, res) => {
-    const { id } = req.params;
-    const { name, course_id, lecturer_id, scheduled_time, venue } = req.body;
-    try {
-        await db.query(
-            "UPDATE classes SET name = ?, course_id = ?, lecturer_id = ?, scheduled_time = ?, venue = ? WHERE id = ?", [name, course_id, lecturer_id, scheduled_time, venue, id]
-        );
-        res.json({ message: "Class updated successfully" });
-    } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 });

@@ -1,14 +1,10 @@
 import express from "express";
-import db from "../config/db.js"; // your MySQL connection
-import { getDashboardStats } from "../controllers/Dashboard.js";
+import db from "../config/db.js";
 
 const router = express.Router();
 
-router.get("/", getDashboardStats);
-
-
-// GET /dashboard-counts
-router.get("/", async(req, res) => {
+// GET /api/dashboard/counts
+router.get("/counts", async(req, res) => {
     try {
         const [students] = await db.query("SELECT COUNT(*) AS totalStudents FROM students");
         const [lecturers] = await db.query("SELECT COUNT(*) AS totalLecturers FROM lecturers");

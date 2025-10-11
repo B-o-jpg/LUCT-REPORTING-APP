@@ -1,43 +1,32 @@
 import express from "express";
 import db from "../config/db.js";
-import {
-    getCourses,
-    addCourse,
-    updateCourse,
-    deleteCourse,
-    exportCoursesExcel
-} from "../controllers/Courses.js";
 
 const router = express.Router();
-
-router.get("/", getCourses);
-router.post("/", addCourse);
-router.put("/:id", updateCourse);
-router.delete("/:id", deleteCourse);
-router.get("/export", exportCoursesExcel);
-
-
 
 // GET all courses
 router.get("/", async(req, res) => {
     try {
-        const [rows] = await db.execute("SELECT id, name, code FROM courses");
+        const [rows] = await db.execute("SELECT id, name, code, lecturer_id FROM courses");
         res.json(rows);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch courses" });
     }
 });
 
 // POST new course
 router.post("/", async(req, res) => {
     try {
-        const { name, code } = req.body;
-        if (!name || !code) return res.status(400).json({ error: "All fields required" });
+        const { name, code, lecturer_id } = req.body;
+        if (!name || !code || !lecturer_id) return res.status(400).json({ error: "All fields required" });
 
-        const [result] = await db.execute("INSERT INTO courses (name, code) VALUES (?, ?)", [name, code]);
-        res.json({ id: result.insertId, name, code });
+        const [result] = await db.execute(
+            "INSERT INTO courses (name, code, lecturer_id) VALUES (?, ?, ?)", [name, code, lecturer_id]
+        );
+        res.json({ id: result.insertId, name, code, lecturer_id });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Failed to add course" });
     }
 });
 
@@ -45,11 +34,14 @@ router.post("/", async(req, res) => {
 router.put("/:id", async(req, res) => {
     try {
         const { id } = req.params;
-        const { name, code } = req.body;
-        await db.execute("UPDATE courses SET name = ?, code = ? WHERE id = ?", [name, code, id]);
+        const { name, code, lecturer_id } = req.body;
+        await db.execute(
+            "UPDATE courses SET name = ?, code = ?, lecturer_id = ? WHERE id = ?", [name, code, lecturer_id, id]
+        );
         res.json({ message: "Course updated" });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Failed to update course" });
     }
 });
 
@@ -60,7 +52,8 @@ router.delete("/:id", async(req, res) => {
         await db.execute("DELETE FROM courses WHERE id = ?", [id]);
         res.json({ message: "Course deleted" });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Failed to delete course" });
     }
 });
 

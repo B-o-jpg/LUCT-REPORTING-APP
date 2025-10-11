@@ -1,38 +1,41 @@
 import db from "../config/db.js";
 
+// GET all ratings
 export const getRatings = async(req, res) => {
     try {
-        // Average score per lecturer
-        const [lecturerRatings] = await db.query(`
-      SELECT l.name AS lecturer, AVG(r.score) AS avgScore
-      FROM reports r
-      JOIN lecturers l ON r.lecturer_id = l.id
-      GROUP BY l.id
+        const [rows] = await db.execute(`
+      SELECT 
+        id,
+        lecturer_id,
+        rating_value,
+        comments,
+        student_id,
+        date_rated
+      FROM lecturer_ratings
+      ORDER BY date_rated DESC
     `);
-
-        // Average score per class
-        const [classRatings] = await db.query(`
-      SELECT c.name AS class, AVG(r.score) AS avgScore
-      FROM reports r
-      JOIN classes c ON r.class_id = c.id
-      GROUP BY c.id
-    `);
-
-        // Average score per course
-        const [courseRatings] = await db.query(`
-      SELECT co.name AS course, AVG(r.score) AS avgScore
-      FROM reports r
-      JOIN classes c ON r.class_id = c.id
-      JOIN courses co ON c.course_id = co.id
-      GROUP BY co.id
-    `);
-
-        res.json({
-            lecturerRatings,
-            classRatings,
-            courseRatings
-        });
+        res.json(rows);
     } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// POST a new rating
+export const submitRating = async(req, res) => {
+    try {
+        const { lecturer_id, student_id, rating_value, comments } = req.body;
+        if (!lecturer_id || !student_id || !rating_value)
+            return res.status(400).json({ error: "Lecturer, Student, and Rating are required" });
+
+        const [result] = await db.execute(
+            `INSERT INTO lecturer_ratings (lecturer_id, student_id, rating_value, comments, date_rated)
+       VALUES (?, ?, ?, ?, NOW())`, [lecturer_id, student_id, rating_value, comments || ""]
+        );
+
+        res.json({ id: result.insertId, lecturer_id, student_id, rating_value, comments });
+    } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 };

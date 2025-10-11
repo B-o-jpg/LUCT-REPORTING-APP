@@ -138,3 +138,19 @@ UPDATE lecturers SET email = 'talasi@luct.ac.ls', department = 'Faculty of Infor
 UPDATE lecturers SET email = 'thokoane@luct.ac.ls', department = 'Faculty of Information and Communication Technology' WHERE id = 2;
 UPDATE lecturers SET email = 'mofolo@luct.ac.ls', department = 'Faculty of Information and Communication Technology' WHERE id = 3;
 UPDATE lecturers SET email = 'molapo@luct.ac.ls', department = 'Faculty of Information and Communication Technology' WHERE id = 4;
+
+ALTER TABLE lecturer_ratings
+ADD COLUMN rating_value DECIMAL(3,2) AFTER lecturer_id,
+ADD COLUMN comments TEXT AFTER rating_value;
+INSERT INTO lecturer_ratings (lecturer_id, student_id, rating_value, comments) VALUES
+(1, 2, 4.5, 'Engaging lessons!'),
+(2, 4, 4.0, 'Good pace and clear examples.'),
+(3, 1, 5, 'Calm and good tutoring'),
+(4, 3, 5, 'Best lecturing and clear notes.');
+
+ALTER TABLE lecturer_ratings
+ADD COLUMN lecturer_name VARCHAR(255) AFTER lecturer_id;
+
+UPDATE lecturer_ratings r
+JOIN lecturers l ON r.lecturer_id = l.id
+SET r.lecturer_name = l.lecturer_name;

@@ -1,32 +1,95 @@
-import React, { useState } from "react";
-import { login } from "./api";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
 export default function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (!email || !password) {
+      setError("Please enter email and password");
+      return;
+    }
+
     try {
-      const res = await login(form);
-      // simple example: store token if returned
-      if (res.data?.token) localStorage.setItem("token", res.data.token);
+      const res = await axios.post("http://localhost:4000/auth/login", { email, password });
+      login(res.data);
       navigate("/");
     } catch (err) {
-      console.error(err);
-      alert("Login failed");
+      setError(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-xl font-semibold mb-4">Login</h2>
-      <form onSubmit={submit} className="space-y-3">
-        <input required value={form.email} onChange={(e)=>setForm({...form,email:e.target.value})} placeholder="Email" className="border p-2 rounded w-full"/>
-        <input required type="password" value={form.password} onChange={(e)=>setForm({...form,password:e.target.value})} placeholder="Password" className="border p-2 rounded w-full"/>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">Login</button>
-      </form>
+    <div className="min-h-screen flex">
+      {/* Left illustration panel */}
+      <div className="hidden md:flex w-1/2 bg-gradient-to-br from-blue-600 to-indigo-700 justify-center items-center">
+        <div className="text-white p-10">
+          <h1 className="text-4xl font-bold mb-4">Welcome to LUCT Dashboard</h1>
+          <p className="text-lg">
+            Track students, courses, reports, and more with real-time analytics. Your administration, simplified.
+          </p>
+        </div>
+      </div>
+
+      {/* Right login panel */}
+      <div className="flex w-full md:w-1/2 justify-center items-center bg-gray-50">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10 m-6">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Welcome Back</h2>
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {/* Email field */}
+            <div className="relative">
+              <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition"
+                required
+              />
+            </div>
+
+            {/* Password field */}
+            <div className="relative">
+              <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-700 transition duration-300"
+            >
+              Login
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-gray-600 text-sm">
+            Don't have an account?{" "}
+            <a href="/register" className="text-blue-600 font-medium hover:underline">
+              Register
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,49 +1,62 @@
 import express from "express";
 import db from "../config/db.js";
-import {
-    getReports,
-    addReport,
-    updateReport,
-    deleteReport,
-    exportReportsExcel
-} from "../controllers/Reports.js";
 
 const router = express.Router();
-
-router.get("/", getReports);
-router.post("/", addReport);
-router.put("/:id", updateReport);
-router.delete("/:id", deleteReport);
-router.get("/export", exportReportsExcel);
-
 
 // GET all reports
 router.get("/", async(req, res) => {
     try {
         const [rows] = await db.execute(`
-            SELECT r.id, s.student_name, c.name AS class_name, r.grade, r.comments
-            FROM reports r
-            JOIN students s ON r.student_id = s.id
-            JOIN classes c ON r.class_id = c.id
-        `);
+      SELECT id, lecturer_id, class_id, week, date_of_lecture, topic, 
+             learning_outcomes, recommendations, actual_students, total_students
+      FROM reports
+    `);
         res.json(rows);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch reports" });
     }
 });
 
 // POST new report
 router.post("/", async(req, res) => {
     try {
-        const { student_id, class_id, grade, comments } = req.body;
-        if (!student_id || !class_id || !grade) return res.status(400).json({ error: "Missing required fields" });
+        const {
+            lecturer_id,
+            class_id,
+            week,
+            date_of_lecture,
+            topic,
+            learning_outcomes,
+            recommendations,
+            actual_students,
+            total_students,
+        } = req.body;
+
+        if (!lecturer_id || !class_id || !week || !date_of_lecture || !topic) {
+            return res.status(400).json({ error: "Required fields missing" });
+        }
 
         const [result] = await db.execute(
-            "INSERT INTO reports (student_id, class_id, grade, comments) VALUES (?, ?, ?, ?)", [student_id, class_id, grade, comments]
+            `INSERT INTO reports
+        (lecturer_id, class_id, week, date_of_lecture, topic, learning_outcomes, recommendations, actual_students, total_students)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+                lecturer_id,
+                class_id,
+                week,
+                date_of_lecture,
+                topic,
+                learning_outcomes || "",
+                recommendations || "",
+                actual_students || 0,
+                total_students || 0,
+            ]
         );
-        res.json({ id: result.insertId, student_id, class_id, grade, comments });
+
+        res.json({ id: result.insertId, ...req.body });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Failed to add report" });
     }
 });
 
@@ -51,13 +64,40 @@ router.post("/", async(req, res) => {
 router.put("/:id", async(req, res) => {
     try {
         const { id } = req.params;
-        const { student_id, class_id, grade, comments } = req.body;
+        const {
+            lecturer_id,
+            class_id,
+            week,
+            date_of_lecture,
+            topic,
+            learning_outcomes,
+            recommendations,
+            actual_students,
+            total_students,
+        } = req.body;
+
         await db.execute(
-            "UPDATE reports SET student_id = ?, class_id = ?, grade = ?, comments = ? WHERE id = ?", [student_id, class_id, grade, comments, id]
+            `UPDATE reports SET
+        lecturer_id = ?, class_id = ?, week = ?, date_of_lecture = ?, topic = ?,
+        learning_outcomes = ?, recommendations = ?, actual_students = ?, total_students = ?
+       WHERE id = ?`, [
+                lecturer_id,
+                class_id,
+                week,
+                date_of_lecture,
+                topic,
+                learning_outcomes || "",
+                recommendations || "",
+                actual_students || 0,
+                total_students || 0,
+                id,
+            ]
         );
+
         res.json({ message: "Report updated" });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Failed to update report" });
     }
 });
 
@@ -68,7 +108,8 @@ router.delete("/:id", async(req, res) => {
         await db.execute("DELETE FROM reports WHERE id = ?", [id]);
         res.json({ message: "Report deleted" });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Failed to delete report" });
     }
 });
 

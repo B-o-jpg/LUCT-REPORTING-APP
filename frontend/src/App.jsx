@@ -1,5 +1,7 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
@@ -13,21 +15,36 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 
 export default function App() {
+  const { user } = useAuth();
+
+  // Wrapper for private routes (requires login)
+  const PrivateRoute = ({ element }) => (user ? element : <Navigate to="/login" replace />);
+
+  // Wrapper for public routes (cannot access if logged in)
+  const PublicRoute = ({ element }) => (!user ? element : <Navigate to="/" replace />);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {user && <Navbar />}
+
       <main className="p-6 max-w-7xl mx-auto">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/students" element={<Students />} />
-          <Route path="/lecturers" element={<Lecturers />} />
-          <Route path="/classes" element={<Classes />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/monitoring" element={<Monitoring />} />
-          <Route path="/rating" element={<Rating />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* Public routes */}
+          <Route path="/login" element={<PublicRoute element={<Login />} />} />
+          <Route path="/register" element={<PublicRoute element={<Register />} />} />
+
+          {/* Private routes */}
+          <Route path="/" element={<PrivateRoute element={<Dashboard />} />} />
+          <Route path="/students" element={<PrivateRoute element={<Students />} />} />
+          <Route path="/lecturers" element={<PrivateRoute element={<Lecturers />} />} />
+          <Route path="/classes" element={<PrivateRoute element={<Classes />} />} />
+          <Route path="/courses" element={<PrivateRoute element={<Courses />} />} />
+          <Route path="/reports" element={<PrivateRoute element={<Reports />} />} />
+          <Route path="/monitoring" element={<PrivateRoute element={<Monitoring />} />} />
+          <Route path="/rating" element={<PrivateRoute element={<Rating />} />} />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
         </Routes>
       </main>
     </div>

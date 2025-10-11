@@ -7,12 +7,12 @@ import { saveAs } from "file-saver";
 const Students = () => {
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState("");
-  const [newStudent, setNewStudent] = useState({ name: "", email: "", course: "" });
+  const [newStudent, setNewStudent] = useState({ student_name: "", course: "" });
 
   // Load students from backend
   const loadStudents = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/students");
+      const res = await axios.get("http://localhost:4000/api/students");
       setStudents(res.data);
     } catch (err) {
       console.error("Failed to load students:", err);
@@ -25,12 +25,12 @@ const Students = () => {
 
   // Add a student
   const handleAddStudent = async () => {
-    if (!newStudent.name || !newStudent.email || !newStudent.course) {
+    if (!newStudent.student_name || !newStudent.course) {
       return alert("All fields required");
     }
     try {
-      await axios.post("http://localhost:4000/students", newStudent);
-      setNewStudent({ name: "", email: "", course: "" });
+      await axios.post("http://localhost:4000/api/students", newStudent);
+      setNewStudent({ student_name: "", course: "" });
       loadStudents(); // refresh table
     } catch (err) {
       console.error(err);
@@ -42,7 +42,7 @@ const Students = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this student?")) return;
     try {
-      await axios.delete(`http://localhost:4000/students/${id}`);
+      await axios.delete(`http://localhost:4000/api/students/${id}`);
       loadStudents();
     } catch (err) {
       console.error(err);
@@ -62,14 +62,13 @@ const Students = () => {
   // Filter for search
   const filtered = students.filter(
     s =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase()) ||
+      s.student_name.toLowerCase().includes(search.toLowerCase()) ||
       s.course.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Students</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-blue-700">Students</h2>
 
       <div className="flex mb-3 gap-2">
         <input
@@ -89,16 +88,9 @@ const Students = () => {
         <div className="flex gap-2 mt-2">
           <input
             type="text"
-            placeholder="Name"
-            value={newStudent.name}
-            onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
-            className="border p-2 rounded flex-1"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={newStudent.email}
-            onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+            placeholder="Student Name"
+            value={newStudent.student_name}
+            onChange={(e) => setNewStudent({ ...newStudent, student_name: e.target.value })}
             className="border p-2 rounded flex-1"
           />
           <input
@@ -116,7 +108,6 @@ const Students = () => {
         <thead className="bg-gray-100">
           <tr>
             <th className="border p-2">Name</th>
-            <th className="border p-2">Email</th>
             <th className="border p-2">Course</th>
             <th className="border p-2">Actions</th>
           </tr>
@@ -124,8 +115,7 @@ const Students = () => {
         <tbody>
           {filtered.map(s => (
             <tr key={s.id}>
-              <td className="border p-2">{s.name}</td>
-              <td className="border p-2">{s.email}</td>
+              <td className="border p-2">{s.student_name}</td>
               <td className="border p-2">{s.course}</td>
               <td className="border p-2">
                 <button className="bg-red-500 text-white px-2 py-1 rounded" onClick={() => handleDelete(s.id)}>
