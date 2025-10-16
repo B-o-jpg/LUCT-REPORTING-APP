@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/LUCT-REPORTING-APP/static/css/main.b2298e13.css",
-    "main.js": "/LUCT-REPORTING-APP/static/js/main.3bb0ba1a.js",
+    "main.css": "/LUCT-REPORTING-APP/static/css/main.ba387b5e.css",
+    "main.js": "/LUCT-REPORTING-APP/static/js/main.c81cd964.js",
     "index.html": "/LUCT-REPORTING-APP/index.html",
-    "main.b2298e13.css.map": "/LUCT-REPORTING-APP/static/css/main.b2298e13.css.map",
-    "main.3bb0ba1a.js.map": "/LUCT-REPORTING-APP/static/js/main.3bb0ba1a.js.map"
+    "main.ba387b5e.css.map": "/LUCT-REPORTING-APP/static/css/main.ba387b5e.css.map",
+    "main.c81cd964.js.map": "/LUCT-REPORTING-APP/static/js/main.c81cd964.js.map"
   },
   "entrypoints": [
-    "static/css/main.b2298e13.css",
-    "static/js/main.3bb0ba1a.js"
+    "static/css/main.ba387b5e.css",
+    "static/js/main.c81cd964.js"
   ]
 }
