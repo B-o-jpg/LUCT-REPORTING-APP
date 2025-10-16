@@ -32,6 +32,8 @@ export default function App() {
           {/* Public routes */}
           <Route path="/login" element={<PublicRoute element={<Login />} />} />
           <Route path="/register" element={<PublicRoute element={<Register />} />} />
+          <Route path="/register" element={<Register />} />
+
 
           {/* Private routes */}
           <Route path="/" element={<PrivateRoute element={<Dashboard />} />} />

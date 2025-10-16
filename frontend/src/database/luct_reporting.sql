@@ -1,4 +1,5 @@
-﻿CREATE DATABASE luct_reporting;
+﻿DROP DATABASE IF EXISTS luct_reporting;
+CREATE DATABASE luct_reporting;
 USE luct_reporting;
 
 CREATE TABLE users (
@@ -82,6 +83,23 @@ CREATE TABLE monitoring_reports (
   FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
 );
 
+CREATE TABLE monitoring (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    faculty_name VARCHAR(100),
+    class_name VARCHAR(100),
+    week INT,
+    date_of_lecture DATE,
+    course_name VARCHAR(100),
+    course_code VARCHAR(20),
+    lecturer_name VARCHAR(100),
+    actual_students INT,
+    total_students INT,
+    venue VARCHAR(100),
+    scheduled_time VARCHAR(50),
+    topic VARCHAR(255),
+    learning_outcomes TEXT,
+    recommendations TEXT
+);
 
 INSERT INTO users (name, email, password, role) VALUES
 ('Boitumelo Mpelane', 'boitumelo@luct.ac.ls', 'boity123', 'student'),

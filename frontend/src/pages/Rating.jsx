@@ -7,7 +7,9 @@ import { saveAs } from "file-saver";
 export default function Rating() {
   const [ratings, setRatings] = useState([]);
   const [query, setQuery] = useState("");
-  const [form, setForm] = useState({ lecturer_id: "", rating_value: 5, comments: "", student_id: "" });
+  const [forms, setForms] = useState([
+    { lecturer_id: "", rating_value: 5, comments: "", student_id: "" },
+  ]);
 
   // Fetch ratings
   const loadRatings = async () => {
@@ -23,16 +25,33 @@ export default function Rating() {
     loadRatings();
   }, []);
 
-  // Submit new rating
-  const submit = async (e) => {
+  // Add new rating form
+  const addForm = () => {
+    setForms([...forms, { lecturer_id: "", rating_value: 5, comments: "", student_id: "" }]);
+  };
+
+  // Remove a rating form
+  const removeForm = (index) => {
+    setForms(forms.filter((_, i) => i !== index));
+  };
+
+  // Update a rating form
+  const updateForm = (index, field, value) => {
+    const newForms = [...forms];
+    newForms[index][field] = value;
+    setForms(newForms);
+  };
+
+  // Submit all ratings
+  const submitAll = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:4000/api/rating", form);
-      setForm({ lecturer_id: "", rating_value: 5, comments: "", student_id: "" });
+      await Promise.all(forms.map(f => axios.post("http://localhost:4000/api/rating", f)));
+      setForms([{ lecturer_id: "", rating_value: 5, comments: "", student_id: "" }]);
       loadRatings();
     } catch (err) {
       console.error(err);
-      alert("Failed to submit rating");
+      alert("Failed to submit ratings");
     }
   };
 
@@ -54,29 +73,60 @@ export default function Rating() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-blue-700">Ratings</h1>
-        <button onClick={exportExcel} className="bg-green-600 text-white px-3 py-2 rounded">Export Excel</button>
+        <button onClick={exportExcel} className="bg-green-600 text-white px-3 py-2 rounded">
+          Export Excel
+        </button>
       </div>
 
       <SearchBar value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search ratings..." />
 
-      <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4">
-        <input
-          placeholder="Lecturer ID"
-          value={form.lecturer_id}
-          onChange={(e) => setForm({ ...form, lecturer_id: e.target.value })}
-          className="border p-2 rounded"
-          required
-        />
-        <select value={form.rating_value} onChange={(e) => setForm({ ...form, rating_value: +e.target.value })} className="border p-2 rounded">
-          {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} stars</option>)}
-        </select>
-        <input
-          placeholder="Comments"
-          value={form.comments}
-          onChange={(e) => setForm({ ...form, comments: e.target.value })}
-          className="border p-2 rounded"
-        />
-        <button className="bg-blue-600 text-white px-3 py-2 rounded">Submit</button>
+      <form onSubmit={submitAll} className="space-y-3 mb-4">
+        {forms.map((form, index) => (
+          <div key={index} className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-center">
+            <input
+              placeholder="Lecturer ID"
+              value={form.lecturer_id}
+              onChange={(e) => updateForm(index, "lecturer_id", e.target.value)}
+              className="border p-2 rounded"
+              required
+            />
+            <select
+              value={form.rating_value}
+              onChange={(e) => updateForm(index, "rating_value", +e.target.value)}
+              className="border p-2 rounded"
+            >
+              {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} stars</option>)}
+            </select>
+            <input
+              placeholder="Comments"
+              value={form.comments}
+              onChange={(e) => updateForm(index, "comments", e.target.value)}
+              className="border p-2 rounded"
+            />
+            <input
+              placeholder="Student ID"
+              value={form.student_id}
+              onChange={(e) => updateForm(index, "student_id", e.target.value)}
+              className="border p-2 rounded"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => removeForm(index)}
+              className="bg-red-600 text-white px-3 py-2 rounded"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <div className="flex gap-2">
+          <button type="button" onClick={addForm} className="bg-gray-600 text-white px-3 py-2 rounded">
+            Add More
+          </button>
+          <button type="submit" className="bg-blue-600 text-white px-3 py-2 rounded">
+            Submit All
+          </button>
+        </div>
       </form>
 
       <ul className="space-y-3">
